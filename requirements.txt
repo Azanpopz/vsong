@@ -33,3 +33,6 @@ psutil
 wget
 tswift
 regex
+
+OpenCC
+opencc
