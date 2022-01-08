@@ -6,7 +6,7 @@
 import logging
 logger = logging.getLogger(__name__)
 import os, re, time, math, json, string, random, traceback, wget, asyncio, datetime, aiofiles, aiofiles.os, requests, youtube_dl, lyricsgenius, wget
-from config import Config
+
 from random import choice 
 from pyrogram import Client, filters
 from youtube_search import YoutubeSearch
@@ -46,7 +46,7 @@ from youtubesearchpython import SearchVideos
 import os
 import logging
 import pyrogram
-from config import Config
+
 
 
 
@@ -78,12 +78,15 @@ from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from youtube_dl import YoutubeDL
 from opencc import OpenCC
-from config import Config
+
 import wget
 
 
 
 
+BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
+API_ID = int(os.environ.get("API_ID", 12345))
+API_HASH = os.environ.get("API_HASH", "")
 
 
 
