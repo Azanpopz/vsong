@@ -98,6 +98,233 @@ Bot = Client(
 db = Database()
 
 
+
+
+@Client.on_message(filters.command(["song", "s", "mu", "aud"]) & ~filters.edited)
+def song(client, message):
+
+    user_id = message.from_user.id
+    user_name = message.from_user.first_name
+    rpk = "[" + user_name + "](tg://user?id=" + str(user_id) + ")"
+
+    query = ""
+    for i in message.command[1:]:
+        query += " " + str(i)
+    print(query)
+    m = message.reply("🔎 Sᴇᴀʀᴄʜɪɴɢ Sᴏɴɢ ᴏɴ Yᴏᴜᴛᴜʙᴇ..! ./n **Upload Getting Slowed due to Heavy Traffic** [Learn More](https://en.m.wikipedia.org/wiki/Network_traffic)")
+    ydl_opts = {"format": "bestaudio[ext=m4a]"}
+    try:
+        results = YoutubeSearch(query, max_results=1).to_dict()
+        link = f"https://youtube.com{results[0]['url_suffix']}"
+        # print(results)
+        title = results[0]["title"][:40]
+        thumbnail = results[0]["thumbnails"][0]
+        thumb_name = f"thumb{title}.jpg"
+        thumb = requests.get(thumbnail, allow_redirects=True)
+        open(thumb_name, "wb").write(thumb.content)
+
+        duration = results[0]["duration"]
+        results[0]["url_suffix"]
+        results[0]["views"]
+
+    except Exception as e:
+        m.edit("❌ Sᴏʀʀʏ I ᴄᴀɴ'ᴛ Fɪɴᴅ ʏᴏᴜʀ Rᴇǫᴜᴇsᴛᴇᴅ Sᴏɴɢ 🙁.\n\nTʀʏ Aɴᴏᴛʜᴇʀ Sᴏɴɢ Nᴀᴍᴇ ᴏʀ Cʜᴇᴄᴋ Sᴘᴇʟʟɪɴɢ..!\n\nIғ ʏᴏᴜ Fᴀᴄɪɴɢ sᴀᴍᴇ ɪssᴜᴇs ғᴏʀ sᴇᴄᴏɴᴅ Tɪᴍᴇ Rᴇᴘᴏʀᴛ ɪᴛ ᴏɴ @NazriyaSupport")
+        print(str(e))
+        return
+    m.edit("∂σωиℓσα∂ιиg ѕσиg тσ ∂αтαвαѕє...ρℓєαѕє ωαιт..! \n\nѕєяνєя ѕρєє∂ : That's None of your Bussiness.")
+    try:
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            info_dict = ydl.extract_info(link, download=True)
+            audio_file = ydl.prepare_filename(info_dict)
+            ydl.process_info(info_dict)
+        rep = "🎵 Sᴏɴɢ Uᴘʟᴏᴀᴅᴇᴅ ғʀᴏᴍ YᴏᴜTᴜʙᴇ Mᴜsɪᴄ..!.\nPᴏᴡᴇʀᴇᴅ ʙʏ [🦋Nazriya](https://t.me/NAZRIYANAZEEMROBOT)"
+        secmul, dur, dur_arr = 1, 0, duration.split(":")
+        for i in range(len(dur_arr) - 1, -1, -1):
+            dur += int(dur_arr[i]) * secmul
+            secmul *= 60
+        message.reply_audio(
+            audio_file,
+            caption=rep,
+            thumb=thumb_name,
+            parse_mode="md",
+            title=title,
+            duration=dur,
+        )
+        m.delete()
+    except Exception as e:
+        m.edit("❌ Error Contact [support](https://t.me/NAZRIYASUPPORT)")
+        print(e)
+
+    try:
+        os.remove(audio_file)
+        os.remove(thumb_name)
+    except Exception as e:
+        print(e)
+
+
+def get_text(message: Message) -> [None, str]:
+    text_to_return = message.text
+    if message.text is None:
+        return None
+    if " " in text_to_return:
+        try:
+            return message.text.split(None, 1)[1]
+        except IndexError:
+            return None
+    else:
+        return None
+
+
+def humanbytes(size):
+    if not size:
+        return ""
+    power = 2 ** 10
+    raised_to_pow = 0
+    dict_power_n = {0: "", 1: "Ki", 2: "Mi", 3: "Gi", 4: "Ti"}
+    while size > power:
+        size /= power
+        raised_to_pow += 1
+    return str(round(size, 2)) + " " + dict_power_n[raised_to_pow] + "B"
+
+
+async def progress(current, total, message, start, type_of_ps, file_name=None):
+    now = time.time()
+    diff = now - start
+    if round(diff % 10.00) == 0 or current == total:
+        percentage = current * 100 / total
+        speed = current / diff
+        elapsed_time = round(diff) * 1000
+        if elapsed_time == 0:
+            return
+        time_to_completion = round((total - current) / speed) * 1000
+        estimated_total_time = elapsed_time + time_to_completion
+        progress_str = "{0}{1} {2}%\n".format(
+            "".join(["💿" for i in range(math.floor(percentage / 10))]),
+            "".join(["📀" for i in range(10 - math.floor(percentage / 10))]),
+            round(percentage, 2),
+        )
+        tmp = progress_str + "{0} of {1}\nETA: {2}".format(
+            humanbytes(current), humanbytes(total), time_formatter(estimated_total_time)
+        )
+        if file_name:
+            try:
+                await message.edit(
+                    "{}\n**File Name:** `{}`\n{}".format(type_of_ps, file_name, tmp)
+                )
+            except FloodWait as e:
+                await asyncio.sleep(e.x)
+            except MessageNotModified:
+                pass
+        else:
+            try:
+                await message.edit("{}\n{}".format(type_of_ps, tmp))
+            except FloodWait as e:
+                await asyncio.sleep(e.x)
+            except MessageNotModified:
+                pass
+
+
+def get_user(message: Message, text: str) -> [int, str, None]:
+    if text is None:
+        asplit = None
+    else:
+        asplit = text.split(" ", 1)
+    user_s = None
+    reason_ = None
+    if message.reply_to_message:
+        user_s = message.reply_to_message.from_user.id
+        reason_ = text if text else None
+    elif asplit is None:
+        return None, None
+    elif len(asplit[0]) > 0:
+        user_s = int(asplit[0]) if asplit[0].isdigit() else asplit[0]
+        if len(asplit) == 2:
+            reason_ = asplit[1]
+    return user_s, reason_
+
+
+def get_readable_time(seconds: int) -> int:
+    count = 0
+    ping_time = ""
+    time_list = []
+    time_suffix_list = ["s", "m", "h", "days"]
+
+    while count < 4:
+        count += 1
+        if count < 3:
+            remainder, result = divmod(seconds, 60)
+        else:
+            remainder, result = divmod(seconds, 24)
+        if seconds == 0 and remainder == 0:
+            break
+        time_list.append(int(result))
+        seconds = int(remainder)
+
+    for x in range(len(time_list)):
+        time_list[x] = str(time_list[x]) + time_suffix_list[x]
+    if len(time_list) == 4:
+        ping_time += time_list.pop() + ", "
+
+    time_list.reverse()
+    ping_time += ":".join(time_list)
+
+    return ping_time
+
+
+def time_formatter(milliseconds: int) -> str:
+    seconds, milliseconds = divmod(int(milliseconds), 1000)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    days, hours = divmod(hours, 24)
+    tmp = (
+        ((str(days) + " day(s), ") if days else "")
+        + ((str(hours) + " hour(s), ") if hours else "")
+        + ((str(minutes) + " minute(s), ") if minutes else "")
+        + ((str(seconds) + " second(s), ") if seconds else "")
+        + ((str(milliseconds) + " millisecond(s), ") if milliseconds else "")
+    )
+    return tmp[:-2]
+
+
+ydl_opts = {
+    "format": "bestaudio/best",
+    "writethumbnail": True,
+    "postprocessors": [
+        {
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            "preferredquality": "196",
+        }
+    ],
+}
+
+
+def get_file_extension_from_url(url):
+    url_path = urlparse(url).path
+    basename = os.path.basename(url_path)
+    return basename.split(".")[-1]
+
+
+# Funtion To Download Song
+async def download_song(url):
+    song_name = f"{randint(6969, 6999)}.mp3"
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            if resp.status == 200:
+                f = await aiofiles.open(song_name, mode="wb")
+                await f.write(await resp.read())
+                await f.close()
+    return song_name
+
+
+is_downloading = False
+
+
+def time_to_seconds(time):
+    stringt = str(time)
+    return sum(int(x) * 60 ** i for i, x in enumerate(reversed(stringt.split(":"))))
+
+
 @Client.on_message(filters.command(["vsong", "video"]))
 async def ytmusic(client, message: Message):
     global is_downloading
@@ -183,5 +410,22 @@ async def ytmusic(client, message: Message):
         if files and os.path.exists(files):
             os.remove(files)
 
-
+@Client.on_message(filters.command("lyrics"))
+async def lrsearch(_, message: Message):  
+    m = await message.reply_text("Searching Lyrics")
+    query = message.text.split(None, 1)[1]
+    x = "OXaVabSRKQLqwpiYOn-E4Y7k3wj-TNdL5RfDPXlnXhCErbcqVvdCF-WnMR5TBctI"
+    y = lyricsgenius.Genius(x)
+    y.verbose = False
+    S = y.search_song(query, get_full_info=False)
+    if S is None:
+        return await m.edit("Lyrics not found :p")
+    xxx = f"""
+**Lyrics Search Powered By @NazriyaSongBot Music Bot**
+**Searched Song:-** __{query}__
+**Found Lyrics For:-** __{S.title}__
+**Artist:-** {S.artist}
+**__Lyrics:__**
+{S.lyrics}"""
+    await m.edit(xxx)
 Bot.run()
