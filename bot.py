@@ -17,7 +17,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, 
 from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid
 from pyrogram.errors.exceptions.bad_request_400 import PeerIdInvalid
 
-from __future__ import unicode_literals
+
 
 import asyncio
 import math
