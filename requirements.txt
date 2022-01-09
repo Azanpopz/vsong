@@ -36,6 +36,6 @@ regex
 
 OpenCC
 opencc
-avconv
+
 ffmpeg
 
