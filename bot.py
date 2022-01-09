@@ -17,6 +17,28 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, 
 from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid
 from pyrogram.errors.exceptions.bad_request_400 import PeerIdInvalid
 
+from __future__ import unicode_literals
+
+import asyncio
+import math
+import os
+import re
+import time
+import lyricsgenius
+from random import randint
+from urllib.parse import urlparse
+
+import aiofiles
+import aiohttp
+import requests
+import wget
+import youtube_dl
+from pyrogram import Client, filters
+from pyrogram.errors import FloodWait, MessageNotModified
+from pyrogram.types import Message
+from youtube_search import YoutubeSearch
+from youtubesearchpython import SearchVideos
+
 
 Bot = Client(
     "Song Downloader Bot",
