@@ -160,7 +160,7 @@ async def send_msg(user_id, message):
 
 
 
-@Client.on_message(filters.command(["song", "s", "mu", "aud"]) & ~filters.edited)
+@Bot.on_message(filters.command(["song", "s", "mu", "aud"]) & ~filters.edited)
 def song(client, message):
 
     user_id = message.from_user.id
@@ -385,7 +385,7 @@ def time_to_seconds(time):
     return sum(int(x) * 60 ** i for i, x in enumerate(reversed(stringt.split(":"))))
 
 
-@Client.on_message(filters.command(["vsong", "video"]))
+@Bot.on_message(filters.command(["vsong", "video"]))
 async def ytmusic(client, message: Message):
     global is_downloading
     if is_downloading:
@@ -470,7 +470,7 @@ async def ytmusic(client, message: Message):
         if files and os.path.exists(files):
             os.remove(files)
 
-@Client.on_message(filters.command("lyrics"))
+@Bot.on_message(filters.command("lyrics"))
 async def lrsearch(_, message: Message):  
     m = await message.reply_text("Searching Lyrics")
     query = message.text.split(None, 1)[1]
